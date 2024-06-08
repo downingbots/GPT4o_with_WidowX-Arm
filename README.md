@@ -28,8 +28,33 @@ Repeat until done:
 When "SUCCESS" or "FAILURE", the robot arm returns to the initial state. 
 
 Unfortunately, the free version is limited to only 2 image uploads a day.
-The action returned was "GRIPPER_CLOSE' (a poor choice of actions). The
+The action returned was "GRIPPER_CLOSE' (a poor choice of actions). When
+I tried again with the same image a few days later, the action returned
+was "DOWN" - a much better choice of actions.  The
 paid version ("plus") is also rate limited to an unknown quota.
+
+GPT4o Describing the image: 
+"The image shows a robotic arm positioned above
+a shallow metal bowl placed on a flat surface. Inside the bowl, there is a
+white plastic spoon. The gripper of the robotic arm is aligned above the
+spoon, ready to descend and grasp it. The background includes parts of a
+workbench or a robotic work area."
+
+GPT4o predicting the sequence of actions: 
+"To accomplish the goal of picking up the spoon and possibly moving it to 
+another location, the robot arm should perform the following sequence of actions:
+
+    DOWN - Move the gripper down to reach the spoon.
+    GRIPPER_CLOSE - Close the gripper to grasp the spoon.
+    UP - Lift the gripper with the spoon.
+    FORWARD - Move the arm forward to clear the bowl.
+    RIGHT (if needed) - Adjust the position to the right if there is a specific target location to place the spoon.
+    DOWN - Lower the spoon to the target location.
+    GRIPPER_OPEN - Open the gripper to release the spoon.
+    UP - Lift the gripper back up.
+    DONE - Indicate the completion of the task.
+
+These actions should allow the robot arm to pick up the spoon from the bowl and move it to a desired location."
 
 It is trivial to modify this POC to use the paid OpenAI APIs to have
 a fully automated GPT-controlled robot arm.
