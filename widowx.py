@@ -108,6 +108,8 @@ class WidowX(object):
 
          self.state = {}      # shared with other classes
          self.fully_open_closed = 0  # gripper position
+         self.open_closed_pos = -1  # gripper position
+         self.open_closed_cnt = 0  # gripper position
          print("Rest:", self.Rest)
          for i in range(self.SERVOCOUNT):
            self.id.append(i + 1)
@@ -377,6 +379,7 @@ class WidowX(object):
                   curr -= 10
                 else:
                   curr -= 1
+                # print("SetPosition2", self.id[idx], curr, pos)
                 self.SetPosition2(self.id[idx], curr)
                 # self.delay(5)
         # self.delay(9)
@@ -387,6 +390,8 @@ class WidowX(object):
     #  movement with control or key that is being sent as long as it is pressed
     def moveGrip(self, open_close):
         posQ6 = self.getServoPosition(self.IDX_GRIPPER)
+        if self.open_closed_cnt == 0:
+          self.open_closed_pos = posQ6
         if (open_close == self.GRIPPER_CLOSED):
             if (posQ6 > self.GRIPPER_OPEN_POS):
                 posQ6 = (self.AX12_MAX - self.GRIPPER_OPEN_POS)
@@ -399,15 +404,28 @@ class WidowX(object):
                 posQ6 -= 10
             elif (posQ6 < self.GRIPPER_OPEN_POS):
                 posQ6 += 10
-                print("posQ6", posQ6, self.GRIPPER_OPEN_POS)
+                # print("posQ6", posQ6, self.GRIPPER_OPEN_POS)
             else:
                 posQ6 = self.GRIPPER_OPEN_POS
+        print("posQ6", posQ6, open_close, self.GRIPPER_OPEN_POS)
+        #      posQ6 125 2 512
+
 
         # ARD: TODO: check temperature/voltage if closing
         # ARD: change to 0/1 if all closed or all open
         # ARD: return 0/0 otherwise
         self.SetPosition2(self.id[self.IDX_GRIPPER], posQ6)
         # self.delay(9)
+        new_posQ6 = self.getServoPosition(self.IDX_GRIPPER)
+        if (abs(new_posQ6 - self.open_closed_pos) < 5):
+           print("same pos cnt:", self.open_closed_cnt, new_posQ6, self.open_closed_pos)
+           self.open_closed_cnt += 1  # gripper stuck closing
+        else:
+           self.open_closed_cnt = 0  # gripper position
+        if self.open_closed_cnt > 3:
+          print("Gripper is grasping something.", self.open_closed_cnt, new_posQ6, posQ6)
+          self.fully_open_closed = self.GRIPPER_CLOSED
+          return self.fully_open_closed
     
         # int load = GetLoad(self.id[self.IDX_GRIPPER])
         # int voltage = GetVoltage(self.id[self.IDX_GRIPPER])
@@ -424,14 +442,13 @@ class WidowX(object):
     
     def openCloseGrip(self, open_close):
         if (open_close != self.GRIPPER_OPEN and open_close != self.GRIPPER_CLOSED):
-          print("o_c", open_close)
+          print("openCloseGrip: bad action", open_close)
           return open_close
-        while (self.fully_open_closed != open_close):
-          print("m_G", open_close)
+        self.fully_open_closed = 0
+        while (self.fully_open_closed == 0 or open_close != self.fully_open_closed):
           self.fully_open_closed = self.moveGrip(open_close)
           self.delay(5)
         # self.delay(300)
-        # print("m_G2", self.fully_open_closed)
         return self.fully_open_closed
     
     #  Sets the specified servo to the given position without a smooth tansition.
@@ -535,7 +552,7 @@ class WidowX(object):
         # point gripper down
         # gamma = (self.AX12_MAX + math.pow(-1,g%2) * float(g))
         gamma = -(self.MX_MAX_POSITION_VALUE - 1)
-        wristAngle = -(gamma / self.MX_MAX_POSITION_VALUE) * (math.pi / 2.0)
+        wristAngle = (gamma / self.MX_MAX_POSITION_VALUE) * (math.pi / 2.0)
         self.moveServo2Angle(3, wristAngle)
     
         # swivel base
@@ -557,6 +574,7 @@ class WidowX(object):
               q1 = math.atan2(Py,Px)
               pos = self.angleToPosition(0, q1)
               self.SetPosition2(self.id[0], pos)
+              self.desired_angle[0] = q1
               # self.delay(300)
               return
              
@@ -586,7 +604,7 @@ class WidowX(object):
                 print("getIK_Gamma_Controller fails: %d %f" % (g, wristAngle))
             else:
               found = True
-              self.interpolate(self.DEFAULT_TIME)  # sets the desired pos
+              self.interpolate(self.DEFAULT_TIME, 4)  # sets the desired pos
               # self.delay(5000)
               self.updatePoint()
               break
@@ -601,7 +619,7 @@ class WidowX(object):
           self.desired_angle[1] = bestIKdist[2]
           self.desired_angle[2] = bestIKdist[3]
           self.desired_angle[3] = bestIKdist[4]
-          self.interpolate(self.DEFAULT_TIME)
+          self.interpolate(self.DEFAULT_TIME, 4)
           self.updatePoint()
         return
 
@@ -613,12 +631,15 @@ class WidowX(object):
         wrist_angle = self.getServoAngle(self.IDX_GAMMA)
         wrist_rot   = self.getServoAngle(self.IDX_ROT)
         posQ6       = self.getServoPosition(self.IDX_GRIPPER)
-        if (posQ6 >= self.GRIPPER_OPEN_POS-self.SERVO_DELTA):
-          self.fully_open_closed = self.GRIPPER_OPEN
-        elif (posQ6 <= self.SERVO_DELTA):
-          self.fully_open_closed = self.GRIPPER_CLOSED
-        else:
-          self.fully_open_closed = 0
+#        if (posQ6 >= self.GRIPPER_OPEN_POS-self.SERVO_DELTA):
+#          self.fully_open_closed = self.GRIPPER_OPEN
+#        elif (posQ6 <= self.SERVO_DELTA):
+#          self.fully_open_closed = self.GRIPPER_CLOSED
+#        else:
+#          self.fully_open_closed = 0
+#        if self.open_closed_cnt > 3:
+#          print("Gripper is grasping something.", self.open_closed_cnt, new_posQ6, posQ6)
+#          self.fully_open_closed = self.GRIPPER_CLOSED
         grip = self.fully_open_closed
     
         # self.state['seqnm'] = seqnm   # no longer required without arbotix
@@ -712,8 +733,11 @@ class WidowX(object):
         self.W[i][2] = tf_3_2 * (qf - q0)
         self.W[i][3] = tf_2_3 * (q0 - qf)
     
-    def interpolate(self, remTime):
-        for i in range(self.SERVOCOUNT):
+    def interpolate(self, remTime, srvocnt = None):
+        if srvocnt is None:
+          svrocnt = self.SERVOCOUNT
+        # for i in range(self.SERVOCOUNT):
+        for i in range(srvocnt):
             self.desired_position[i] = self.angleToPosition(i, self.desired_angle[i])
             self.cubeInterpolation(self.current_position[i], self.desired_position[i], i, remTime)
     
@@ -723,7 +747,8 @@ class WidowX(object):
         while (currentTime < remTime):
             curr_2 = math.pow(currentTime, 2)
             curr_3 = math.pow(currentTime, 3)
-            for i in range(self.SERVOCOUNT-1):
+            # for i in range(self.SERVOCOUNT-1):
+            for i in range(srvocnt):
                 self.next_position[i] = round(self.W[i][0] + self.W[i][1] * currentTime + self.W[i][2] * curr_2 + self.W[i][3] * curr_3)
                 self.SetPosition2(self.id[i], self.next_position[i])
                 # self.delay(5)
@@ -731,7 +756,10 @@ class WidowX(object):
             currentTime = self.millis() - t0
     
         cur_pos = 0
-        for i in range(self.SERVOCOUNT-1):
+        # for i in range(self.SERVOCOUNT-1):
+        if srvocnt == self.SERVOCOUNT:
+          srvocnt = self.SERVOCOUNT-1
+        for i in range(srvocnt):
           for numtry in range(3):
             cur_pos = self.getServoPosition(i)
             if (abs(int(self.desired_position[i]) - cur_pos) > self.SERVO_DELTA):

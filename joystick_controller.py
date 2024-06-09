@@ -307,7 +307,8 @@ class JoystickController(object):
           time.sleep(1)
         self.joystick_threshold = 10
         self.wrist_angle = 0
-        self.wrist_rot_vel = 0
+        # self.wrist_rot_vel = 0
+        self.wrist_rotation_velocity = 0
         self.open_close = 1      # open when started
         self.running = False
         self.recording = False
@@ -561,16 +562,17 @@ class JoystickController(object):
                   z = vz 
        
             # r = self.widowx.state['Rot']
-            r = orig_pose['Rot']
-            if vr is not None and vr != r:
-                if abs(vr - r) > self.DELTA_ACTION:
-                  if vr > r:
-                    r = r + self.DELTA_ACTION
-                  else:
-                    r = r - self.DELTA_ACTION
-                  # delta_action_performed = True
-                else:
-                  r = vr 
+#            r = orig_pose['Rot']
+#            if vr is not None and vr != r:
+#                if abs(vr - r) > self.DELTA_ACTION:
+#                  if vr > r:
+#                    r = r + self.DELTA_ACTION
+#                  else:
+#                    r = r - self.DELTA_ACTION
+#                  # delta_action_performed = True
+#                else:
+#                  r = vr 
+            r = vr 
 
             # gamma = self.widowx.state['Gamma']
             gamma = orig_pose['Gamma']
@@ -655,8 +657,14 @@ class JoystickController(object):
     # a cross-over interface between joystick & widowx.py, deals with move_mode
     def move(self, vx, vy, vz, vg, vr, goc):
         initial_time = self.widowx.millis()
-        if (vr and self.move_mode != 'Absolute'):
+        if (vr and self.move_mode == 'Absolute'):
             self.widowx.moveServoWithSpeed(4, vr, initial_time)
+        elif vr != None:
+            print("move vr:", vr, self.widowx.current_angle[self.widowx.IDX_ROT])
+            ax12pos = vr + 512
+            self.widowx.moveServo2Position(self.widowx.IDX_ROT, ax12pos)  # servo id 5 / idx 4: rotate gripper to angle
+        if goc != None and goc != 0:
+            self.widowx.openCloseGrip(goc)
         if (vx or vy or vz or vg):
           if (self.move_mode == 'Relative'):
             fvx = min(max(-1.75, (float(vx) / 127.0 * 1.75)), 1.75)
@@ -665,11 +673,6 @@ class JoystickController(object):
             fvg = min(max(-1.4, (float(vg) / 255.0 * 1.4)), 1.4)
             self.widowx.movePointWithSpeed(fvx, fvy, fvz, fvg, initial_time)
             self.gripper_fully_open_closed = self.widowx.moveGrip(goc)
-            if vr != None:
-              print("move vr:", vr, self.widowx.current_angle[self.widowx.IDX_ROT])
-              self.widowx.moveServo2Angle(self.widowx.IDX_ROT, vr)  # servo id 5 / idx 4: rotate gripper to angle
-            if goc != None:
-              self.widowx.openCloseGrip(goc)
           elif (self.move_mode == 'Absolute'):
             self.widowx.moveArmGammaController(vx, vy, vz, vg)
             angle = (float(vr) / 256.0) * math.pi
@@ -834,14 +837,14 @@ class JoystickController(object):
                 vx = vy = vz = vgamma = vg_rot = o_c = None
                 if button == 'wrist rotate left' and button_state == 1:
                   if self.wrist_rotation_velocity >= 0:
-                    self.wrist_rotation_velocity = -20
+                    self.wrist_rotation_velocity -= 20
                   elif -255 < self.wrist_rotation_velocity < 0:
                     self.wrist_rotation_velocity -= 20
                   print("wrist rotation velocity", self.wrist_rotation_velocity)
                   vg_rot = self.wrist_rotation_velocity
                 elif button == 'wrist rotate right' and button_state == 1:
                   if self.wrist_rotation_velocity <= 0:
-                    self.wrist_rotation_velocity = 20
+                    self.wrist_rotation_velocity += 20
                   elif 255 > self.wrist_rotation_velocity > 0:
                     self.wrist_rotation_velocity += 20
                   print("wrist rotation velocity", self.wrist_rotation_velocity)

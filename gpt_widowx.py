@@ -52,6 +52,7 @@ class widowx_client():
         self.started = True
         self.config = read_config()
         self.move_mode = 'Relative'
+        # self.move_mode = 'Absolute'
         # 0.196 vs 0.785
         self.MAX_SWIVEL = math.pi / 16
         # self.MAX_SWIVEL = atan2(1.75, 1.75)
@@ -65,6 +66,13 @@ class widowx_client():
         self.GRIPPER_OPEN   = 0b01
         self.gripper_fully_open_closed = None
 
+    def moveRest(self):
+        self.widowx.moveRest()
+
+    def moveArmPick(self):
+        self.widowx.moveArmPick()
+
+
     def set_move_mode(self, mode):
         # AKA:      absolute point         relative point
         if mode != 'Absolute' and mode != 'Relative':
@@ -76,7 +84,7 @@ class widowx_client():
         return [True, None]
 
     def gripper(self, o_c):
-        print("gripper: ", o_c, self.widowx.state['Gripper'], self.GRIPPER_CLOSED)
+        print("gripper: ", o_c, self.widowx.state['Gripper'])
         if self.widowx.state['Gripper'] == self.GRIPPER_CLOSED:  
           return
         if not self.widowx.state['Gripper'] == self.GRIPPER_OPEN: 
@@ -90,7 +98,8 @@ class widowx_client():
 
     def wrist_rotate(self,angle):
         print("wrist_rotate: ", angle)
-        self.set_move_mode('Absolute')
+        # self.set_move_mode('Absolute')
+        self.set_move_mode('Relative')
         self.action(vr=angle)
 
     # swivel relative to current position
@@ -171,16 +180,17 @@ class widowx_client():
                   z = vz 
        
             # r = self.widowx.state['Rot']
-            r = orig_pose['Rot']
-            if vr is not None and vr != r:
-                if abs(vr - r) > self.DELTA_ACTION:
-                  if vr > r:
-                    r = r + self.DELTA_ACTION
-                  else:
-                    r = r - self.DELTA_ACTION
-                  # delta_action_performed = True
-                else:
-                  r = vr 
+#            r = orig_pose['Rot']
+#            if vr is not None and vr != r:
+#                if abs(vr - r) > self.DELTA_ACTION:
+#                  if vr > r:
+#                    r = r + self.DELTA_ACTION
+#                  else:
+#                    r = r - self.DELTA_ACTION
+#                  # delta_action_performed = True
+#                else:
+#                  r = vr 
+            r = vr 
 
             # gamma = self.widowx.state['Gamma']
             gamma = orig_pose['Gamma']
@@ -236,6 +246,7 @@ class widowx_client():
                 delta_action_performed = False
             # self.episode_step()
             delta_action_performed = False
+            self.widowx.getState()
 
         # "ACTION_DIM_LABELS = ['X', 'Y', 'Z', 'Yaw', 'Pitch', 'Roll', 'Grasp']\n",
         else:
@@ -244,8 +255,9 @@ class widowx_client():
           if vy is None: vy = 0
           if vz is None: vz = 0
           if vg is None: vg = 0
-          if vr is None: vr = 0
-          if goc is None: goc = 0
+          # if vr is None: vr = 0
+          # if goc is None: goc = 0
+
           # x,y,z are relative.  Need to normalize.
           # No longer need to reduce to byte commands for microprocessor
           # vx = min(max(-127, round(vx * 127.0 / 1.75)), 127)
@@ -266,8 +278,17 @@ class widowx_client():
     def move(self, vx, vy, vz, vg, vr, goc):
         print("MOVE:", self.move_mode, vx, vy, vz, vg, vr, goc)
         initial_time = self.widowx.millis()
-        if (vr and self.move_mode != 'Absolute'):
-            self.widowx.moveServoWithSpeed(4, vr, initial_time)
+        # vr and goc only move in "Relative" mode for gpt control
+        if (vr is not None and self.move_mode == 'Absolute'):
+            # self.widowx.moveServoWithSpeed(self.widowx.IDX_ROT, vr, initial_time)
+            pass
+        elif vr is not None:
+            print("move vr:", vr, self.widowx.current_angle[self.widowx.IDX_ROT])
+            ax12pos = vr + 512
+            self.widowx.moveServo2Position(self.widowx.IDX_ROT, ax12pos)  # servo id 5 / idx 4: rotate gripper to angle
+
+        if goc is not None and self.move_mode == 'Relative':
+            self.widowx.openCloseGrip(goc)
         if (vx or vy or vz or vg):
           if (self.move_mode == 'Relative'):
             fvx = min(max(-1.75, (float(vx) / 127.0 * 1.75)), 1.75)
@@ -275,22 +296,8 @@ class widowx_client():
             fvz = min(max(-1.75, (float(vz) / 127.0 * 1.75)), 1.75)
             fvg = min(max(-1.4, (float(vg) / 255.0 * 1.4)), 1.4)
             self.widowx.movePointWithSpeed(fvx, fvy, fvz, fvg, initial_time)
-            self.gripper_fully_open_closed = self.widowx.moveGrip(goc)
-            if vr != None:
-              print("move vr:", vr, self.widowx.current_angle[self.widowx.IDX_ROT])
-              self.widowx.moveServo2Angle(self.widowx.IDX_ROT, vr)  # servo id 5 / idx 4: rotate gripper to angle
-            if goc != None:
-              self.widowx.openCloseGrip(goc)
           elif (self.move_mode == 'Absolute'):
             self.widowx.moveArmGammaController(vx, vy, vz, vg)
-            angle = (float(vr) / 256.0) * math.pi
-            self.widowx.moveServoWithSpeed(self.widowx.IDX_ROT, angle, initial_time)
-            self.gripper_fully_open_closed = self.widowx.openCloseGrip(goc)
-          # elif (moveOption == self.USER_FRIENDLY):
-            # used by joystick controller only
-            # self.moveArmWithSpeed(vx, vy, vz, vg, initial_time)
-        elif goc != 0:
-          self.gripper_fully_open_closed = self.widowx.openCloseGrip(goc)
 
 ###################################################3
 def read_config():
@@ -330,12 +337,13 @@ time.sleep(2)
 # first snapshot isn't properly tuned; take snapshot & throw away.
 im, im_file, im_time = robot_camera.snapshot(True)
 robot_images = [] # init robot arm
-robot_arm =  WidowX()
+# robot_arm =  WidowX()
 # initialize by starting from Rest Position
-robot_arm.moveRest()
+# robot_arm.moveRest()
 
 wdw = widowx_client()
-wdw.set_move_mode('Absolute')
+wdw.moveRest()
+# wdw.set_move_mode('Absolute')
 
 #########################################################
 # Move to Initial Arm Position as taken from config file
@@ -352,8 +360,9 @@ pz = state["z"]
 pg = state["gamma"] 
 pq5 = state["rot"] 
 gripper_open = state["gripper"] 
-robot_arm.moveArmPick()
+wdw.moveArmPick()
 wdw.set_move_mode('Relative')
+# wdw.set_move_mode('Absolute')
 im, im_file, im_time = robot_camera.snapshot(True)
 robot_image = Image.fromarray(np.array(im))
 # robot_images.append(im)
@@ -363,6 +372,7 @@ robot_image.save(latest_image)
 # s = []   # state history
 observation  = {}
 observations = []
+wrist_rotation_velocity = 0
 
 #########################################################
 # Run as many steps as necessary
@@ -378,7 +388,7 @@ while True:
 
   # observation state for dataset
   # s.append(copy.deepcopy(robot_arm.state))
-  observation['state'] = copy.deepcopy(robot_arm.state)
+  observation['pre-state'] = copy.deepcopy(wdw.widowx.state)
 
   ####################
   # store the image in sequence
@@ -395,7 +405,7 @@ while True:
            "SUCCESS", "FAILURE"] 
   print("Select action:")
   for i in range(len(robot_actions)):
-    if i < 10:
+    if i < 9:
       print(str(i+1) + "  " + robot_actions[i])
     else:
       print(str(i+1) + " " + robot_actions[i])
@@ -403,45 +413,64 @@ while True:
     print("")
     print("action:")
     action_number = input()
-    if int(action_number) <= len(robot_actions):
-      break
+    try:
+      if int(action_number) <= len(robot_actions):
+        break
+    except:
+      pass
   robot_action = robot_actions[int(action_number)-1]
   # robot_action['terminate_episode'] = True
   observation['action'] = robot_action
   ############################################################
   # Move the robot based on selected action and take snapshot
   ############################################################
+  wdw.set_move_mode('Relative')
   if robot_action == "FORWARD":
-    wdw.action(vx=wdw.DELTA_ACTION)
+    wdw.action(vx=127)
   elif robot_action == "BACKWARD":
-    wdw.action(vx= -wdw.DELTA_ACTION)
+    wdw.action(vx= -127)
   elif robot_action == "UP":
-    wdw.action(vz= wdw.DELTA_ACTION)
+    wdw.action(vz= 127)
   elif robot_action == "DOWN":
-    wdw.action(vz= -wdw.DELTA_ACTION)
+    wdw.action(vz= -127)
   elif robot_action == "LEFT":
-    wdw.action(vy= -wdw.DELTA_ACTION)
+    wdw.action(vy= 127)
   elif robot_action == "RIGHT":
-    wdw.action(vy= wdw.DELTA_ACTION)
+    wdw.action(vy= -127)
   elif robot_action == "ROTATE_ARM_CLOCKWISE":
     wdw.do_swivel("RIGHT")
   elif robot_action == "ROTATE_ARM_COUNTERCLOCKWISE":
     wdw.do_swivel("LEFT")
   elif robot_action == "ROTATE_GRIPPER_CLOCKWISE":
-    wdw.wrist_rotate(wdw.DELTA_ANGLE)
+    if wrist_rotation_velocity <= 0:
+      wrist_rotation_velocity += 20
+    elif 255 > wrist_rotation_velocity > 0:
+      wrist_rotation_velocity += 20
+    print("wrist rotation velocity", wrist_rotation_velocity)
+    vg_rot = wrist_rotation_velocity
+    # wdw.action(vr= vg_rot)
+    wdw.wrist_rotate(vg_rot)
   elif robot_action == "ROTATE_GRIPPER_COUNTERCLOCKWISE":
-    wdw.wrist_rotate( -wdw.DELTA_ANGLE)
+    if wrist_rotation_velocity <= 0:
+      wrist_rotation_velocity -= 20
+    elif 255 > wrist_rotation_velocity > 0:
+      wrist_rotation_velocity -= 20
+    print("wrist rotation velocity", wrist_rotation_velocity)
+    vg_rot = wrist_rotation_velocity
+    # wdw.action(vr= vg_rot)
+    wdw.wrist_rotate(vg_rot)
   elif robot_action == "GRIPPER_OPEN":
     wdw.gripper(wdw.GRIPPER_OPEN)
   elif robot_action == "GRIPPER_CLOSE": 
     wdw.gripper(wdw.GRIPPER_CLOSED)
   elif robot_action == "SUCCESS":
     wdw.gripper(wdw.GRIPPER_OPEN)
-    robot_arm.moveArmPick()
+    wdw.moveArmPick()
   elif robot_action == "FAILURE": 
     wdw.gripper(wdw.GRIPPER_OPEN)
-    robot_arm.moveArmPick()
+    wdw.moveArmPick()
   
+  observation['post-state'] = copy.deepcopy(wdw.widowx.state)
   observations.append(copy.deepcopy(observation))
   print(observation)
   im, im_file, im_time = robot_camera.snapshot(True)
