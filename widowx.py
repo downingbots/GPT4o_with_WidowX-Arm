@@ -51,7 +51,7 @@ class WidowX(object):
          self.IDX_GAMMA   = 3
          self.IDX_ROT     = 4
          self.IDX_GRIPPER = 5
-         self.GRIPPER_OPEN_POS = 512
+         self.GRIPPER_OPEN_POS = 508
          self.GRIPPER_OPEN = 1
          self.GRIPPER_CLOSED = 2
          self.GRIPPER_DOWN_ANGLE = (-(self.MX_MAX_POSITION_VALUE - 1) / self.MX_MAX_POSITION_VALUE) * (math.pi / 2.0)
@@ -401,12 +401,13 @@ class WidowX(object):
                 posQ6 = 0
         elif (open_close == self.GRIPPER_OPEN):
             if (posQ6 > self.GRIPPER_OPEN_POS):
-                posQ6 -= 10
+                # posQ6 -= 10
+                posQ6 = self.GRIPPER_OPEN_POS + 2
             elif (posQ6 < self.GRIPPER_OPEN_POS):
                 posQ6 += 10
                 # print("posQ6", posQ6, self.GRIPPER_OPEN_POS)
             else:
-                posQ6 = self.GRIPPER_OPEN_POS
+                posQ6 = self.GRIPPER_OPEN_POS + 2
         print("posQ6", posQ6, open_close, self.GRIPPER_OPEN_POS)
         #      posQ6 125 2 512
 

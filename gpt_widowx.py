@@ -85,9 +85,9 @@ class widowx_client():
 
     def gripper(self, o_c):
         print("gripper: ", o_c, self.widowx.state['Gripper'])
-        if self.widowx.state['Gripper'] == self.GRIPPER_CLOSED:  
+        if o_c not in [self.GRIPPER_OPEN, self.GRIPPER_CLOSED]:
           return
-        if not self.widowx.state['Gripper'] == self.GRIPPER_OPEN: 
+        if self.widowx.state['Gripper'] == o_c:
           return
         elif self.move_mode == 'Relative': # use relative values
              self.action(goc=o_c)
