@@ -33,7 +33,7 @@ When "SUCCESS" or "FAILURE", the robot arm returns to the initial state.
 For the command: "pick up the white spoon and place it to the right of the pot",
 a sample human result was:
 
-![Alt Text]([https://media.giphy.com/media/vFKqnCdLPNOKc/giphy](https://github.com/downingbots/GPT4o_with_WidowX-Arm/blob/main/spoon_human.gif))
+<img src="https://github.com/downingbots/GPT4o_with_WidowX-Arm/blob/main/spoon_human.gif" width="120" height="120" />
 
 The results when using chatgptplus are below.  It appears that chatgpt executes 
 a simple plan to pick up the spoon and place it to the right, but didn't realize
@@ -41,7 +41,8 @@ that the robot arm gripper failed to actually pick up the spoon.  Further prompt
 engineering is probably required.  The results are promising enough to continue
 experimenting using the chatgpt api for chatgpt4o.
 
-![Alt Text]([https://media.giphy.com/media/vFKqnCdLPNOKc/giphy](https://github.com/downingbots/GPT4o_with_WidowX-Arm/blob/main/spoon_chatgptplus.gif))
+<img src="https://github.com/downingbots/GPT4o_with_WidowX-Arm/blob/main/spoon_chatgptplus.gif" width="120" height="120" />
+
 
 GPT4o Describing the image: 
 "The image shows a robotic arm positioned above
