@@ -8,7 +8,10 @@ This is a bare-bones python-only proof of concept implementation based
 on an old widowx arm in the BridgeData hardware configuration.  The code
 is modified from my attempt to fine-tune the Aloha Octo model.
 
-The Free version of GPT4o is used.  Run "ChatGPT" from a browser:
+The Free version of GPT4o was originally attempted, but the number of
+images allowed to be uploaded per day was extremely limited and not
+usable for this purpose.  A ChatGPT+ subscription was usable though.
+Run "ChatGPT" from a browser:
 https://chatgpt.com/?model=gpt-4o 
 
 Run the following command on my laptop:
@@ -27,11 +30,18 @@ Repeat until done:
 
 When "SUCCESS" or "FAILURE", the robot arm returns to the initial state. 
 
-Unfortunately, the free version is limited to only 2 image uploads a day.
-The action returned was "GRIPPER_CLOSE' (a poor choice of actions). When
-I tried again with the same image a few days later, the action returned
-was "DOWN" - a much better choice of actions.  The
-paid version ("plus") is also rate limited to an unknown quota.
+For the command: "pick up the white spoon and place it to the right of the pot",
+a sample human result was:
+
+![Alt Text]([https://media.giphy.com/media/vFKqnCdLPNOKc/giphy](https://github.com/downingbots/GPT4o_with_WidowX-Arm/blob/main/spoon_human.gif))
+
+The results when using chatgptplus are below.  It appears that chatgpt executes 
+a simple plan to pick up the spoon and place it to the right, but didn't realize
+that the robot arm gripper failed to actually pick up the spoon.  Further prompt
+engineering is probably required.  The results are promising enough to continue
+experimenting using the chatgpt api for chatgpt4o.
+
+![Alt Text]([https://media.giphy.com/media/vFKqnCdLPNOKc/giphy](https://github.com/downingbots/GPT4o_with_WidowX-Arm/blob/main/spoon_chatgptplus.gif))
 
 GPT4o Describing the image: 
 "The image shows a robotic arm positioned above
@@ -57,5 +67,6 @@ another location, the robot arm should perform the following sequence of actions
 These actions should allow the robot arm to pick up the spoon from the bowl and move it to a desired location."
 
 It is trivial to modify this POC to use the paid OpenAI APIs to have
-a fully automated GPT-controlled robot arm.
+a fully automated GPT-controlled robot arm. That's the next thing on
+my todo list.
   
