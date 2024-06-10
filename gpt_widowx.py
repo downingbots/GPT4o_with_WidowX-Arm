@@ -1,11 +1,11 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
-import rlds
-from rlds import transformations
-from rlds import rlds_types
-import tf_agents
-from tf_agents.policies import py_tf_eager_policy
-from tf_agents.trajectories import time_step as ts
+# import rlds
+# from rlds import transformations
+# from rlds import rlds_types
+# import tf_agents
+# from tf_agents.policies import py_tf_eager_policy
+# from tf_agents.trajectories import time_step as ts
 from IPython import display
 from PIL import Image
 import numpy as np
@@ -393,6 +393,9 @@ while True:
   ####################
   # store the image in sequence
   display.Image(as_gif(robot_images, True))
+  # display.Image(im_file, True)
+  # print("filename:", im_file)
+  # display.Image(im_file, True)
   print("image ready to upload; press return when uploaded.")
   wait_for_return = input()
 
