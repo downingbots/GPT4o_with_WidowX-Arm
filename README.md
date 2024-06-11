@@ -15,19 +15,21 @@ struggles with tasks requiring precise spatial localization, such as
 identifying chess positions.
 
 This repository containss a bare-bones python-only proof of concept implementation 
-to control an old Trossen WidowX arm in Stanford's BridgeData hardware configuration.  
-The code is modified from my attempt to fine-tune the Aloha Octo model.
+to control an old Trossen WidowX arm in Stanford's BridgeData hardware 
+configuration.  The code is modified from my initial attempt to fine-tune 
+the Aloha Octo model.
 
 The Free version of GPT4o was originally attempted to be used to control
 the robot arm, but the number of images allowed to be uploaded per day was 
 extremely limited and not usable for this purpose.  A ChatGPT+ subscription 
 was usable though.
 
-Run "ChatGPT" with the GPT4o model from a browser:
+To use ChatGPT to control the robot arm without using the API, run "ChatGPT" 
+with the GPT4o model from a browser:
 https://chatgpt.com/?model=gpt-4o 
 
 Run the following command on the laptop controlling the arm:
-python gpt_widowx.py
+"python gpt_widowx.py"
 
 Enter the prompt from prompt.txt into chatGPT. The prompt defines the 
 GPT command and robot actions that GPT can perform and the step-by-step
