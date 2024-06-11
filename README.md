@@ -15,16 +15,18 @@ struggles with tasks requiring precise spatial localization, such as
 identifying chess positions.
 
 This repository containss a bare-bones python-only proof of concept implementation 
-based on an old widowx arm in the BridgeData hardware configuration.  The code
-is modified from my attempt to fine-tune the Aloha Octo model.
+to control an old Trossen WidowX arm in Stanford's BridgeData hardware configuration.  
+The code is modified from my attempt to fine-tune the Aloha Octo model.
 
-The Free version of GPT4o was originally attempted to be used, but the number of
-images allowed to be uploaded per day was extremely limited and not
-usable for this purpose.  A ChatGPT+ subscription was usable though.
-Run "ChatGPT" from a browser:
+The Free version of GPT4o was originally attempted to be used to control
+the robot arm, but the number of images allowed to be uploaded per day was 
+extremely limited and not usable for this purpose.  A ChatGPT+ subscription 
+was usable though.
+
+Run "ChatGPT" with the GPT4o model from a browser:
 https://chatgpt.com/?model=gpt-4o 
 
-Run the following command on my laptop:
+Run the following command on the laptop controlling the arm:
 python gpt_widowx.py
 
 Enter the prompt from prompt.txt into chatGPT. The prompt defines the 
@@ -47,12 +49,9 @@ a sample human result was:
 
 The results when using chatgptplus are below.  It appears that chatgpt executes 
 a simple plan to pick up the spoon and place it to the right, but didn't realize
-that the robot arm gripper failed to actually pick up the spoon.  Further prompt
-engineering is probably required.  The results are promising enough to continue
-experimenting using the chatgpt api for chatgpt4o.
+that the robot arm gripper failed to actually pick up the spoon. 
 
 <img src="https://github.com/downingbots/GPT4o_with_WidowX-Arm/blob/main/spoon_chatgptplus.gif" width="120" height="120" />
-
 
 GPT4o Describing the image: 
 "The image shows a robotic arm positioned above
