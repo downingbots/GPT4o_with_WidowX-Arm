@@ -1,10 +1,11 @@
 # USING OPENAI'S GPT4O WITH A LOW-END ROBOT ARM
 
 In this repository, I try to bypass the training of a robot arm altogether
-by using CHATGPT's GPT4o to provide step-by-step actions for the robot
-arm to preform a given overall command.
+by iteratively uploading an image to CHATGPT's GPT4o and use GPT4o to 
+respond with best next action for the robot arm to perform to achieve a 
+given overall command.
 
-From the manual: the model is best at answering general questions about 
+From the ChatGPT4o manual: the model is best at answering general questions about 
 what is present in the images. While it does understand the relationship 
 objects in images, it is not yet optimized to answer detailed questions 
 about the location of certain objects in an image. For example, you can 
@@ -12,10 +13,12 @@ ask it what color a car is or what some ideas for dinner might be based
 on what is in you fridge, but if you show it an image of a room and ask 
 it where the chair is, it may not answer the question correctly. The model 
 struggles with tasks requiring precise spatial localization, such as 
-identifying chess positions.
+identifying chess positions. 
 
-This repository containss a bare-bones python-only proof of concept implementation 
-to control an old Trossen WidowX arm in Stanford's BridgeData hardware 
+My lone experiment appears to verify this limitation with spatial localization.
+
+This repository contains a bare-bones python-only proof of concept implementation 
+to control an old Trossen WidowX robotic arm in Stanford's BridgeData hardware 
 configuration.  The code is modified from my initial attempt to fine-tune 
 the Aloha Octo model.
 
@@ -38,11 +41,11 @@ interactions.
 Repeat until done:
   - manually upload an image into ChatGPT and GPT4o provides the next 
     action for the robot to perform.  
-  - manually input the action into the python program
+  - manually input GPT4o's action into the python program
   - the python program performs the robot action and provides the next
     image to upload.
 
-When "SUCCESS" or "FAILURE", the robot arm returns to the initial state. 
+After "SUCCESS" or "FAILURE", the robot arm returns to the initial state. 
 
 For the command: "pick up the white spoon and place it to the right of the pot",
 a sample human result was:
@@ -79,6 +82,7 @@ another location, the robot arm should perform the following sequence of actions
 These actions should allow the robot arm to pick up the spoon from the bowl and move it to a desired location."
 
 It is trivial to modify this POC to use the paid OpenAI APIs to have
-a fully automated GPT-controlled robot arm. That's the next thing on
-my todo list.
+a fully automated GPT-controlled robot arm. Debugging the GPT4o API version
+to control the robot arm is on my todo-list, but I don't currently have
+a paid subscription given the limitations of spacial localization.
   
