@@ -4,11 +4,21 @@ In this repository, I try to bypass the training of a robot arm altogether
 by using CHATGPT's GPT4o to provide step-by-step actions for the robot
 arm to preform a given overall command.
 
-This is a bare-bones python-only proof of concept implementation based 
-on an old widowx arm in the BridgeData hardware configuration.  The code
+From the manual: the model is best at answering general questions about 
+what is present in the images. While it does understand the relationship 
+objects in images, it is not yet optimized to answer detailed questions 
+about the location of certain objects in an image. For example, you can 
+ask it what color a car is or what some ideas for dinner might be based 
+on what is in you fridge, but if you show it an image of a room and ask 
+it where the chair is, it may not answer the question correctly. The model 
+struggles with tasks requiring precise spatial localization, such as 
+identifying chess positions.
+
+This repository containss a bare-bones python-only proof of concept implementation 
+based on an old widowx arm in the BridgeData hardware configuration.  The code
 is modified from my attempt to fine-tune the Aloha Octo model.
 
-The Free version of GPT4o was originally attempted, but the number of
+The Free version of GPT4o was originally attempted to be used, but the number of
 images allowed to be uploaded per day was extremely limited and not
 usable for this purpose.  A ChatGPT+ subscription was usable though.
 Run "ChatGPT" from a browser:
