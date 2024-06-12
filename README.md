@@ -85,4 +85,9 @@ It is trivial to modify this POC to use the paid OpenAI APIs to have
 a fully automated GPT-controlled robot arm. Debugging the GPT4o API version
 to control the robot arm is on my todo-list, but I don't currently have
 a paid subscription given the limitations of spacial localization.
-  
+
+Remember Google's SayCan?  It seems like GPT4o could replace the 
+combination of GPT-3 and CLIP, but still would need the open-vocabulary
+object detection provided by ViLD to produce bounding boxes around the 
+objects for spacial localization.  In addition, you'd need to 
+provide a layer to manipulate the objects.
