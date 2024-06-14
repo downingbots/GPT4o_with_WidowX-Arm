@@ -19,9 +19,9 @@ identifying chess positions.
 My lone experiment appears to verify this limitation with spatial localization.
 
 This repository contains a bare-bones python-only proof of concept implementation 
-to control an old Trossen WidowX robotic arm in Stanford's BridgeData hardware 
-configuration.  The code is modified from my initial attempt to fine-tune 
-the Aloha Octo model.
+to control an old Trossen WidowX robotic arm in Stanford/UCBerkeley's BridgeData hardware 
+configuration. ( https://rail-berkeley.github.io/bridgedata/ ) The code is modified from my initial attempt to fine-tune 
+the Aloha Octo model. ( https://github.com/downingbots/Aloha_Octo_with_WidowX_Arm )
 
 The Free version of GPT4o was originally attempted to be used to control
 the robot arm, but the number of images allowed to be uploaded per day was 
