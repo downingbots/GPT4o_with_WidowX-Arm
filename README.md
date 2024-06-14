@@ -47,8 +47,16 @@ Repeat until done:
 
 After "SUCCESS" or "FAILURE", the robot arm returns to the initial state. 
 
-For the command: "pick up the white spoon and place it to the right of the pot",
-a sample human result was:
+The command to GPT4o was: "pick up the white spoon and place it to the right of the pot".
+
+GPT4o can return the following actions that move the robot arm a little bit in the specified
+direction: FORWARD, BACKWARD, UP, DOWN, LEFT, RIGHT, 
+ROTATE_ARM_CLOCKWISE, ROTATE_ARM_COUNTERCLOCKWISE, 
+ROTATE_GRIPPER_CLOCKWISE,  ROTATE_GRIPPER_COUNTERCLOCKWISE,
+GRIPPER_OPEN, GRIPPER_CLOSE,
+DONE
+
+A sample result using a human in the loop (instead of GPT4o) was:
 
 <img src="https://github.com/downingbots/GPT4o_with_WidowX-Arm/blob/main/spoon_human.gif" width="120" height="120" />
 
