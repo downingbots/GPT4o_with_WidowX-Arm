@@ -1,5 +1,6 @@
 # WidowX.cpp - Library to control WidowX Robotic Arm of Trossen Robotics
 # Created by Lenin Silva, June, 2020
+# Ported to Python and modified by Alan Downing, March 2024
 #  
 #  MIT License
 # 
