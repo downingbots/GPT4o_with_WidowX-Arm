@@ -46,7 +46,7 @@ Repeat until done:
   - the python program performs the robot action and provides the next
     image to upload.
 
-After "SUCCESS" or "FAILURE", the robot arm returns to the initial state. 
+After "DONE", the robot arm returns to the initial state. 
 
 The command to GPT4o was: "pick up the white spoon and place it to the right of the pot".
 
