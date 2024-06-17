@@ -100,3 +100,21 @@ combination of GPT-3 and CLIP, but still would need the open-vocabulary
 object detection provided by ViLD to produce bounding boxes around the 
 objects for spacial localization.  In addition, you'd need to 
 provide a layer to manipulate the objects.
+
+Instead of using ViLD, you can alternatively use YOLO-World. As an 
+experiment, you could upload a picture to ChatGPT4o by clicking the 
+paperclip. Even with the free version of ChatGPT, you'll probably need to 
+create a login: 
+https://chatgpt.com/?model=gpt-4o 
+
+Enter the prompt: "list the nouns that you see in this photo, separated by commas"
+
+In another tab, goto: https://huggingface.co/spaces/stevengrove/YOLO-World
+and upload the same picture.  Under the categories to be detected, cut-and-paste 
+the list of nouns from ChatGPT, and see what you get.
+
+Unfortuantely, you still have the spacial localization problem with GPT4o
+and you will still can't easily use GPT4o to figure out a plan to "push 
+the red cube between the two yellow cubes."
+
+
