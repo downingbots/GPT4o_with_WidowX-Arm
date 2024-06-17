@@ -3,7 +3,10 @@
 In this repository, I try to bypass the training of a robot arm altogether
 by iteratively uploading an image to CHATGPT's GPT4o and use GPT4o to 
 respond with best next action for the robot arm to perform to achieve a 
-given overall command.
+given overall command.  The goal is to complete a high level command like 
+"pick up the white spoon and move it to the right of the pan" similar
+to the commands/skills executed by Google's "SayCan", DeepMind's "RT-X", 
+Berkeley's "BridgeData" or Stanford's Aloha 2.
 
 From the ChatGPT4o manual: the model is best at answering general questions about 
 what is present in the images. While it does understand the relationship 
@@ -102,15 +105,18 @@ objects for spacial localization.  In addition, you'd need to
 provide a layer to manipulate the objects.
 
 Instead of using ViLD, you can alternatively use YOLO-World. As an 
-open-vocabulary experiment with both GPT4o and YOLO, you could upload 
-a picture to ChatGPT4o by clicking the paperclip. Even with the free 
+open-vocabulary experiment with both GPT4o and YOLO, you could:
+
+1. upload a picture to ChatGPT4o by clicking the paperclip. Even with the free 
 version of ChatGPT, you'll probably need to create a login: 
 https://chatgpt.com/?model=gpt-4o 
 
-Enter the prompt: "list the nouns that you see in this photo, separated by commas"
+2. Enter the prompt: "list the nouns that you see in this photo, separated by commas"
 
-In another tab, goto: https://huggingface.co/spaces/stevengrove/YOLO-World
-and upload the same picture.  Under the categories to be detected, cut-and-paste 
+3. In another tab, goto: https://huggingface.co/spaces/stevengrove/YOLO-World
+and upload the same picture.
+
+4. Under the categories to be detected, cut-and-paste 
 the list of nouns from ChatGPT, and see what you get.
 
 Unfortunately, you still have the spacial localization problem with GPT4o
